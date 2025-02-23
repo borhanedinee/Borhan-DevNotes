@@ -6,7 +6,7 @@ every animation system has some properties
 		this is done by creating an object of type AnimationController within the initState
 
 		2- look, in every animation , we are going from a begin state to an end state , so the begin and end must be two values of same type
-			-- they have different types , based on the kind of animation , slide transition (offset) , scale and fade transtions (double) , colors , ....
+			-- they have different types , based on the kind of animation , slide transition (both must be offset) , scale and fade transtions (both must be double) , colors , ....
 			-- so here first u have to specify these two values or this interval using a Tween Object
 
 				animation = Tween<Offset>(begin : Offset(-1,0) , end : Offset(0,0))
@@ -19,19 +19,19 @@ every animation system has some properties
 
 			-- so as you see we linked between the tween object and the animation controller with the help of .animate() and CurvedAnimation()
 
-			-- now you be wondering what that curve mean , curve has more configurations about the animation , like its timing ect
+			-- now you may be wondering what that curve mean , curve has more configurations about the animation , like its timing ect
 				-- generally it takes an interval object Interval( begin : value  , end : value  , curve : Curves.EaseOut )
 				-- value of begin and end is between ( 0.0 and 1.0)
-					what does it mean ? after u specify the values for begin and end , a pourcentage will be calculated 
+					what does it mean ? after u specify the values for begin and end ( of interfvalle object not tween ) , a pourcentage will be calculated 
 						for exemple u put
 								begin : .5
 								end : 1
 							this means that it is 50%
-							and it means that this animation will be executed in the 50% of the timing specified within the AnimationController
+							and it means that this animation will be executed in the first 50% of the timing specified within the AnimationController
 						means if pourcentage is 100% means the timing of the animation will take all the total time 
     
-						it is like شريط , that u specify when do you want the animation to be compared to the total timing of the animation
+						it is like a line, that u specify when do you want the animation to be compared to the total timing of the animation
 
 
 		4- lastly u just call the animation<T> which is a result of  Tween().animate() , within the controller of the animation widget
-				--was it FateTranstion  ,  SlideTransition , SlideTransition ect
+				--was it FateTranstion  ,  SlideTransition , SlideTransition ect and it will animate based on the configurations that you have set

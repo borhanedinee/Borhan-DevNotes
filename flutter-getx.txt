@@ -1,0 +1,35 @@
+how can gets handle the state in a flutter app?
+
+- it has controllers , where the state ( variables to be displayed on the screen ) are stored . each screen generally has its corresponding GetxController
+
+- so for each screen ,you define the variables that must be displayed on that screen
+
+- then the state of those variables are changed based on events sent or triggered from the screen . 
+
+for exemple a button to fetch active users is clicked , the event is sent to the controller , the controller will call the function responsible for fetching active users , and then when active users are fetched ( from backend or idk what API u use ) , the variable of active users thats defined within the same controller will be updated with new value .
+
+	then the screen can access that variable ( active users ) 
+
+now you might be asking how will the screen rebuild with the new fetched data ?
+
+each screen as we said , in its code , is wrapped by GetBuilder<of specific controller> , that is used to rebuild the widgets wrapped inside it ( update the screen )
+- GetBuilder will listen to function called update() that is called within the GetxController
+
+means , screen of active users is wrapped by GetBuilder<ActiveUsersController> 
+
+when the function for fetching active users that is within ActiveUsersController is triggered , if the fetch is successfull , update() is called , causing every widgets that is within GetBuilder<ActiveUsersController> to rebuild.
+
+
+in ActiveUsersController that extends GetxController we have something like :
+
+
+
+	fetchActiveUsers()async{
+		try{
+			//assuming fetch is successfull
+			// updating state of activeUsers
+			activeUsers = fetchedActiveUsers;
+			update();
+			// this update function will look up the widgets tree , and every widgets that is wrapped by GetBuilder<ActiveUsersBuilder> will get rebuilt with new state.
+
+		} catch (e){}
