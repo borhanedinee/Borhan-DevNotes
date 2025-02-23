@@ -1,0 +1,16 @@
+you can send push notifications from server side to a device, il suffit brk ykon device en ligne
+
+how ?
+
+keyna afssa esmha fcm - firebase cloud messaging - tpassilha token te3 client ( telephone ) title , body te notification the n u click send
+mbe3d some registered app will recieve that notification
+
+il suffit brk you register that app for le projet firebase li rah tb3t notification mno , bah tedi token te3 device w yweli the device listening to the notifications from the firebase , how u register the app ?? easy , just visit your google console account w creyi projet and add your flutter project to the project li creyitih , apres you will need to add some dependecies , and google service file to your android folder ect.
+
+now maybe you are asking, this is sending it from firebase to my phone , how can i send a notification from the server side to my app?
+
+if suffit , to add fcm admin package for express JS , then u do some configuration , in three lines maybe , admin object ect to access the functions
+
+apres this package will offer what fcm does , a function to send notification to the device , il faut brk u fetch the corresponding token te device from database wla jsp win khabitih , apres dir send function
+
+then u call this send function within the endpoint where you want the device to be notified when this endpoint is triggered.

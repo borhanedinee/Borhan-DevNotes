@@ -1,0 +1,17 @@
+- u use 
+import {query , body , validationResult , matchedData} from "express-validator"
+u need these four functions to validate the data sent to the endpoint
+
+query to validate GET parameters
+body to validate POST parameters 
+and in both functions you just need to pass the field that you want to validate , then pass the functions that u want to validate for ex :
+	 body("username").isString().isEmpty()
+
+validationResult function will accept the REQUEST passed from the middlware body or query as a parameter , and will give you a result containing ERROR VALIDATION if exists ,
+
+	result = validationResult(request)
+	
+if result is empty means no errors , else there are errors and res.status(400).send(error)
+
+matchedData will accept the REQUEST passed from the middlware body or query as a parameter , then will return the result of the validated result ,, as if it returns the body ,, then u use the data returned in your script ( to fetch from database , or to insert into db ect )
+

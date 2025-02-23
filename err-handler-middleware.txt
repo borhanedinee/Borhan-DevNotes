@@ -1,0 +1,22 @@
+express js can allow you to catch all the error that may occur on your backend
+
+you just need to identify the error handler as follows
+
+		errHandler = ( err , req , res , next ) => { res.status(err.statusCode).json({ pass the error response too the client })}
+
+as u can see the error handler middleware is taking four parameters , and by that the express js will automatically recognize it as
+error handler middleware and if any error will occur , it will pass the error to this error handler,
+
+you just need to set some things
+
+1) app.use(errorHandler)
+
+2) within the endpoints , within your try catch blocs , within your if statemnents , generally whereever you are expecting an error to happen ,
+there you have to create error object
+
+		const err = new Error('pass the msg');
+		err.statusCode = pass the status code
+then pass the error object to the middlware using        next(err)
+
+so not as usual , the next() function will not call the next middlware in the stack , whenever we pass a parameter to the next function , 
+express will recognize that an error has occured and we should pass to the error handler middlware directly , regardless of its place in the middlware stack

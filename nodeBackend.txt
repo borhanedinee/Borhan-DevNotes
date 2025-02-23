@@ -1,0 +1,54 @@
+nodejs backend
+
+- step 0:
+	is to create your folder that yozu want to build your backend in
+	then u command 
+			npm init -y
+	so that the package.json file gets downloaded
+	the u install express and mysql using
+			npm install express mysql
+
+
+- first you have to set up your server, and this can be done by importing the express depenedency that will allow us start our server
+	we have to create an object from our express using app = express(),
+	then we will define our port that our server will be listenning on,
+	then we will make our server (app) uses json middlware which is express.json(),
+	then we will make our server listens to the port using app.listen
+
+- SETTING UP ROUTERS:
+	instead of creating the whole backend on the same file and creating the routers using app.get('/api/signin/') , app.post('/api/signnup/')
+	we will seperate the routers to files , each router category will be on one file , for exemple for handling auth events we will create auth router on a seperate file,
+	and for handling products we will create product router on another file FOR CLEAAAAN CODE,
+	HOW CAN WE SEPERATE ROUTERS??
+		simply we have to create an object of router using express.Router() as follows authRouter = express.Router() / productRouter = express.Router() 
+		and we will export this routers using 
+			module.exports = authRouter
+		then we go to our server which is app and we tell it to use these routers by app.use(authRouter) / app.use(productRouter)
+		and in the seperate files of routers we handle the APIs as follows
+			authRouter.get('/api/signin/')
+			authRouter.post('/api/signup/')
+			productRouter.post('/api/addProduct/')
+
+- POSTING DATA AND SENDING RESPONSES TO THE CLIENT :
+	inside the route.get() or route.post() functions theres is a function which takes response and request as parameters 
+	its like (req , res) => {here you can pass SQL querries ect}
+	the data sent by the client to the server is in req.body if POST , req.params if GET
+	if you want to send data to the server you just use res.json(and here pass your data) 
+		exemple 
+			req.json(
+				   {
+					'msg':'Logged in successfully'
+				   }
+				);
+
+- CONNECT BACKEND TO SQL DATABASE
+	here you have to install the mysql package
+	then require it and create on object 
+		const db = mysql.createConnection({
+   					 host: 'localhost',
+    				 	 user: 'root',
+     					 password: '',
+      					 database: 'todos'
+					});
+	then pass the queries within the APIs endpoints through db.query(sql , dataPassedToSql , (err , results)=>{handle response})
+	
