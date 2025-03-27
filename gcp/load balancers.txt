@@ -1,11 +1,11 @@
-- load balancers are in cloud they are services that allows you to distribute traffic towards many servers ( VMs etc ) to ensure scalablity and availability.
+- load balancers in cloud are services that allow you to distribute traffic towards many servers ( VMs etc ) to ensure scalablity and availability.
 
 - in GCP we can implement a load balancer that forwards traffic to the internal VMs as follows
 
 	- FIRST: we should create and set the group of VMs that we want to send the traffic to
 		there are two types of groups
 			- MANAGED INTSNACE GROUP : this type of group is the more reliable one because its autoscalable ( up and down ), 
-				means whenever a VM in the group is unhealthy , or the VMs are offloaded , it will handle that automatically
+				means whenever a VM in the group is unhealthy , or the VMs are loaded , it will handle that automatically
 				by replacing the unhealthy VMs with anew functional one , and by adding other VMs to scale up.
 				- you just have to set the template of the VMs by creating
 
