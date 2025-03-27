@@ -1,0 +1,135 @@
+- load balancers are in cloud they are services that allows you to distribute traffic towards many servers ( VMs etc ) to ensure scalablity and availability.
+
+- in GCP we can implement a load balancer that forwards traffic to the internal VMs as follows
+
+	- FIRST: we should create and set the group of VMs that we want to send the traffic to
+		there are two types of groups
+			- MANAGED INTSNACE GROUP : this type of group is the more reliable one because its autoscalable ( up and down ), 
+				means whenever a VM in the group is unhealthy , or the VMs are offloaded , it will handle that automatically
+				by replacing the unhealthy VMs with anew functional one , and by adding other VMs to scale up.
+				- you just have to set the template of the VMs by creating
+
+				gcloud compute instance-template creat NAME -- properties of the VMs ( this template will be used as blueprint to create VMs )
+
+			- UNMANAGED INSTANCE GROUP : unlike MIG , UIG is manually configured , means you create the VMs seperately each has its own configs
+				and when a VM goes down or whenever you need to scale up etc ,you have to intervent manually ( so not recommended )
+
+		
+		so when creating the instance-group we have two ways to add VMs to it
+
+			- in case of MIG : gcloud compute instance-groups managed create lb-backend-group \
+   							--template=lb-backend-template --size=2 --zone=Zone
+				means u tell the system to create 2 VMs ( size = 2 ) from the precreated template ( lb-backend-template ) when the load balancer is meant to be ON.
+
+
+			- in case of UIG : first u have to create the VMs seperately using 
+						gcloud compute instance create NAME -- properties
+				then you assign the created VMs to an unmanaged group using
+						gcloud compute instance-groups unmanaged create backend-group --zone=us-central1-a
+						gcloud compute instance-groups unmanaged add-instances backend-group   --instances=vm-1,vm-2,vm-3 --zone=us-central1-a
+	
+	THEN YOU HAVE TO ADD A FIREWALL RULE TO ALLOW HTTP TRAFFIC TO THOSE VMS USING THE TAGS YOU SPECIFIED WHEN CREATING THE VMS
+
+	ALSO YOU HAVE TO CREATE A HEATH-CHECK THAT CHECKS IF THE VMS IS ACCEPTING HTTP OR NOT , this will be useful later to not send traffic to an unhealthy VM
+						gcloud compute health-checks create http http-basic-check --port 80
+
+
+	- SECOND: once the group instance is configured ( wether via MIG or UIG ) , you have to create a backedn-service and assign that group to it.
+		-the backedn service is responsible for forwarding traffic to a specific VM.
+
+		-so before sending the traffic to a specific VM , it should ensure tO SELECT a healthy VM based on the health-check assigned to the backedn-service 
+			which in this case is checking incoming http, so the backend service will pick a VM from the assigned group , that has incoming http health-check verified 
+
+		SO THE BACKEND SERVICE SHOULD BE CONFIGURED AS
+
+				CREATING : gcloud compute backend-services create web-backend-service \
+ 						 --protocol=HTTP \
+  						 --port-name=http \
+  						 --health-checks=http-basic-check \ THIS IS THE HTTP HEALTH CHECK WE TALKED ABOUT	
+ 						 --global
+
+
+				ASSIGNING THE GROUP : gcloud compute backend-services add-backend web-backend-service \
+ 						          	--instance-group=lb-backend-group \
+  								--instance-group-zone=Zone \
+  								--global
+
+
+
+
+
+
+	- THIRD : now we should create url-map 
+			what does it do ? it checks the encrypted url , and forwards traffic to the corresponding backend-service
+
+			e.g : if the url is /auth means the URL-MAP will forward traffic to the auth backend service that has VMs that handle auth service
+			      if the url is /shop means the URL-MAP will forward traffic to the shop backend service that has VMs that handle shop service
+
+				gcloud compute url-maps add-path-matcher my-url-map \
+   					   --path-matcher-name=my-path-matcher \
+ 					   --default-service=my-default-backend \
+ 					   --backend-service-path-rules="/auth=my-auth-backend,/shop=my-shop-backend"
+
+			THE URL-MAP WILL SEND ANY TRAFFIC COMING FROM THE NON-SPECIFIED URLS in PATH-RULE, to the DEFAULT BACKEND SERVICE .
+
+
+
+	- FOURTH : creating a proxy , why ? because usually incomping trafic is https ( encrypted ) means if we forward it directly to url-map , 
+			it will not be able to extract the url to guide traffic accordingly.
+
+			So we need a proxy that terminates SSL/TLS(dcrypt https) and send the request as http readable format where the URL-MAP 
+				can extract the url of the request and forward the traffic to the backedn . service corresponding.
+
+	NOTE : IF THE TRAFFIC WERE TO COME ONLY FROM HTTP ( NOT ENCRYPTED REQUEST ) ====> THE PROX WOULD BE USEFUL
+
+
+
+
+
+	- FIFTH : the final and starting point is setting up the forwarding rule that listens to all the traffic on some IP ADDRESS 
+						( the actual IP ADDRESS EXPOSED TO USERS - the load balancer IP ADDRESS )
+				and it forward any traffic on that IP to the specified proxy that terminates SSL TLS and
+				 sends the request to the url-map that sends the traffic to the corresponding backend service that 
+					sends the traffic to a healthy VM within the specified group.
+
+
+		the forwarding rule is a part of Google Front End ( that catches all the incomping traffic , like the very external layer )
+			picture it as guard of a club that is stood up on the door , and whenever someone reaches it , it forwards them to the proxy ect.
+
+
+
+
+				SO IT ALL CAN BE SUMMED UP INTO THIS DIAGRAM  → GFE → forwarding rule → proxy → URL map → backend → VM
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
